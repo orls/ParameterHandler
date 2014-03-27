@@ -116,6 +116,13 @@ class Processor
         return $this->getParams($expectedParams, $actualParams);
     }
 
+    /**
+     * For every possible param name, try to discover an env variable that matches it
+     *
+     * @param  array  $paramNames array of possible params
+     * @param  [type] $envPrefix  a prefix to that is expected on every env-var
+     * @return array              k=>v map of param names to the values discovered from env
+     */
     private function getAutoEnvValues(array $paramNames, $envPrefix)
     {
         $params = array();
