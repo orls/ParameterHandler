@@ -99,17 +99,18 @@ class Processor
             $actualParams = array_intersect_key($actualParams, $expectedParams);
         }
 
-        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
 
-        $envPrefix = empty($config['env-auto-prefix']) ? null : $config['env-auto-prefix'];
-
-        // Add the params coming from the environment values
-        if (!empty($envPrefix)) {
-            // if auto-env-var translation is configured, attempt to replace a param `foo` with
-            // env var `MYPREFIX_FOO`
-            $actualParams = array_replace($actualParams, $this->getAutoEnvValues(array_keys($actualParams), $envPrefix));
+        if (!empty($config['env-auto-prefix'])) {
+            // if auto-env-var translation is configured, discover values from env
+            $actualParams = array_replace($actualParams, $this->getAutoEnvValues(
+                array_keys($actualParams),
+                $config['env-auto-prefix']
+            ));
         }
 
+        $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
+
+        // Add the params coming from the known, defined map of environment values
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
         return $this->getParams($expectedParams, $actualParams);
