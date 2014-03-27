@@ -99,8 +99,40 @@ The script handler looks for a ``parameters`` key in your dist file.  You can ch
 
 For your prod environment, using an interactive prompt may not be possible
 when deploying. In this case, you can rely on environment variables to provide
-the parameters. This is achieved by providing a map between environment variables
-and the parameters they should fill:
+the parameters. This can be achieved in two ways: automatically searching for env
+variables with a given prefix, or providing a map between environment variables
+and the parameters they should fill.
+
+#### Automatic environment variables
+
+You can enable automatic environment variable discovery by defining a prefix:
+
+```json
+{
+    "extra": {
+        "incenteev-parameters": {
+            "env-auto-prefix": "MYPROJECT_"
+        }
+    }
+}
+```
+
+For every parameter defined, its name will be converted to a form suitable for
+an environment variable:
+
+- the parameter name is uppercased
+- hyphens become single underscores
+- periods become double-underscores
+- the given prefix is added.
+
+If a matching env variable is found, its value will be used. For example,
+given a parameter named `my.param` and the JSON config above, the environment
+variable `MYPROJECT_MY__PARAM` will be used if it is set.
+
+#### Explicit environment variables
+
+A fixed mapping of environment variables can be also be used, independent of
+whether automatic discovery is also used:
 
 ```json
 {
@@ -115,8 +147,10 @@ and the parameters they should fill:
 }
 ```
 
-If an environment variable is set, its value will always replace the value
-set in the existing parameters file.
+Explicily-mapped env variables will take precedence over automatically-discovered ones.
+
+In both cases, if a matching environment variable is set, its value will always
+replace the value set in the existing parameters file.
 
 As environment variables can only be strings, they are also parsed as inline
 Yaml values to allows specifying ``null``, ``false``, ``true`` or numbers
