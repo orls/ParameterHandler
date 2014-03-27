@@ -101,10 +101,32 @@ class Processor
 
         $envMap = empty($config['env-map']) ? array() : (array) $config['env-map'];
 
+        $envPrefix = empty($config['env-auto-prefix']) ? null : $config['env-auto-prefix'];
+
         // Add the params coming from the environment values
+        if (!empty($envPrefix)) {
+            // if auto-env-var translation is configured, attempt to replace a param `foo` with
+            // env var `MYPREFIX_FOO`
+            $actualParams = array_replace($actualParams, $this->getAutoEnvValues(array_keys($actualParams), $envPrefix));
+        }
+
         $actualParams = array_replace($actualParams, $this->getEnvValues($envMap));
 
         return $this->getParams($expectedParams, $actualParams);
+    }
+
+    private function getAutoEnvValues(array $paramNames, $envPrefix)
+    {
+        $params = array();
+        foreach ($paramNames as $paramName) {
+            $envName = $envPrefix . strtoupper(str_replace(array('.', '-'), '_', $paramName));
+            $value = getenv($envName);
+            if ($value) {
+                $params[$paramName] = Inline::parse($value);
+            }
+        }
+
+        return $params;
     }
 
     private function getEnvValues(array $envMap)
