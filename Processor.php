@@ -127,7 +127,15 @@ class Processor
     {
         $params = array();
         foreach ($paramNames as $paramName) {
-            $envName = $envPrefix . strtoupper(str_replace(array('.', '-'), '_', $paramName));
+
+            $envName = strtoupper($paramName);
+
+            $envName = str_replace('.', '__', $envName);
+
+            $envName = str_replace('-', '_', $envName);
+
+            $envName =  $envPrefix . $envName;
+
             $value = getenv($envName);
             if ($value) {
                 $params[$paramName] = Inline::parse($value);
