@@ -103,7 +103,7 @@ class Processor
         if (!empty($config['env-auto-prefix'])) {
             // if auto-env-var translation is configured, discover values from env
             $actualParams = array_replace($actualParams, $this->getAutoEnvValues(
-                array_keys($actualParams),
+                array_keys($expectedParams),
                 $config['env-auto-prefix']
             ));
         }
